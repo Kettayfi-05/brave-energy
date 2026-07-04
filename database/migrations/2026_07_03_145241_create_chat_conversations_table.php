@@ -13,6 +13,19 @@ return new class extends Migration
     {
         Schema::create('chat_conversations', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
+
+            $table->string('session_id')->nullable();
+
+            $table->enum('status', [
+                'active',
+                'closed'
+            ])->default('active');
+
             $table->timestamps();
         });
     }

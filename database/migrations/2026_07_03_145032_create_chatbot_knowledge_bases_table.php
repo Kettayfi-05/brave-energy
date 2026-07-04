@@ -13,6 +13,17 @@ return new class extends Migration
     {
         Schema::create('chatbot_knowledge_bases', function (Blueprint $table) {
             $table->id();
+
+            $table->string('title');
+
+            $table->text('question');
+
+            $table->longText('answer');
+
+            $table->json('keywords')->nullable();
+
+            $table->boolean('is_active')->default(true);
+
             $table->timestamps();
         });
     }
