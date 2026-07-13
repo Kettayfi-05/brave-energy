@@ -12,7 +12,21 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Inter', ...defaultTheme.fontFamily.sans],
+                display: ['Space Grotesk', 'sans-serif'],
+                mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+                'be-bg': '#12181F',
+                'be-bg-2': '#1B232C',
+                'be-amber': '#F5B301',
+                'be-copper': '#C9702B',
+                'be-cream': '#F7F5F1',
+                'be-ink': '#161B22',
+                'be-green': '#2E8B57',
+            },
+            spacing: {
+                '18': '4.5rem',
             },
         },
     },

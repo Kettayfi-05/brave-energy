@@ -5,9 +5,11 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\DashboardController;
 
 // ─── Public Routes ────────────────────────────────────────────────────────────
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::view('/', 'home.index')->name('home');
+Route::view('/dashboard', 'dashboard')->name('dashboard');
+Route::view('/about', 'about.index')->name('about');
+Route::view('/contact', 'contact.index')->name('contact');
+Route::view('/home', 'home.index')->name('home');
 
 // ─── Breeze Profile Routes (auth users) ───────────────────────────────────────
 Route::middleware('auth')->group(function () {
