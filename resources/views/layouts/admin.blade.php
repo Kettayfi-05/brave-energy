@@ -15,7 +15,8 @@
         #sidebar {
             width: 260px;
             min-height: 100vh;
-            background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 60%, #0f172a 100%);
+            background: #12181F; /* Graphite */
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
             transition: width 0.3s ease, transform 0.3s ease;
             position: fixed;
             top: 0; left: 0;
@@ -31,7 +32,7 @@
             margin-left: 260px;
             transition: margin-left 0.3s ease;
             min-height: 100vh;
-            background: #f1f5f9;
+            background: #F7F5F1; /* Cream */
         }
         #main-content.expanded { margin-left: 72px; }
 
@@ -42,7 +43,7 @@
             gap: 12px;
             padding: 11px 18px;
             border-radius: 10px;
-            color: #94a3b8;
+            color: rgba(247, 245, 241, 0.65); /* Cream text/65 */
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
@@ -50,14 +51,14 @@
             white-space: nowrap;
         }
         .nav-link:hover {
-            background: rgba(139,92,246,.15);
-            color: #a78bfa;
+            background: rgba(255, 255, 255, 0.05);
+            color: #F5B301; /* Amber */
             transform: translateX(3px);
         }
         .nav-link.active {
-            background: linear-gradient(90deg, rgba(139,92,246,.35), rgba(99,102,241,.2));
-            color: #c4b5fd;
-            border-left: 3px solid #7c3aed;
+            background: rgba(245, 179, 1, 0.08); /* Amber transparency */
+            color: #F5B301;
+            border-left: 3px solid #F5B301;
         }
         .nav-link svg { flex-shrink: 0; }
 
@@ -69,22 +70,22 @@
             overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,.12); }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,.08); }
 
         /* ── Table ── */
-        .admin-table th { font-size: 11px; font-weight: 600; letter-spacing:.08em; text-transform:uppercase; color:#64748b; padding:12px 16px; }
-        .admin-table td { padding:14px 16px; border-bottom:1px solid #f1f5f9; font-size:14px; color:#334155; }
+        .admin-table th { font-size: 11px; font-weight: 600; letter-spacing:.08em; text-transform:uppercase; color:#161B22; padding:12px 16px; }
+        .admin-table td { padding:14px 16px; border-bottom:1px solid rgba(0,0,0,0.04); font-size:14px; color:#161B22; }
         .admin-table tr:last-child td { border-bottom: none; }
-        .admin-table tr:hover td { background:#f8fafc; }
+        .admin-table tr:hover td { background: rgba(0,0,0,0.015); }
 
         /* ── Topbar ── */
         #topbar {
             position: sticky;
             top: 0;
             z-index: 40;
-            background: rgba(255,255,255,.9);
+            background: rgba(247, 245, 241, 0.85); /* Cream bg */
             backdrop-filter: blur(12px);
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
 
         /* ── Badge ── */
@@ -99,14 +100,14 @@
         <!-- Logo -->
         <div class="flex items-center gap-3 px-5 py-6 border-b border-white/10">
             <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                 style="background:linear-gradient(135deg,#7c3aed,#6366f1)">
-                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                 style="background:linear-gradient(135deg,#F5B301,#C9702B)">
+                <svg class="w-5 h-5 text-be-ink" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M13 2 3 14h7l-1 8 11-14h-7l0-6z"/>
                 </svg>
             </div>
             <div class="sidebar-label">
                 <p class="text-white font-bold text-sm leading-none">Brave Energy</p>
-                <p class="text-purple-300 text-xs mt-0.5">Administration</p>
+                <p class="text-amber-400 text-[10px] uppercase font-mono font-bold tracking-wider mt-0.5">Administration</p>
             </div>
         </div>
 
@@ -161,6 +162,20 @@
                 </svg>
                 <span class="sidebar-label">Chatbot</span>
             </a>
+
+            <a href="{{ route('admin.contact-messages.index') }}"
+               class="nav-link {{ request()->routeIs('admin.contact-messages.*') ? 'active' : '' }}">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                <span class="sidebar-label">Messages de contact</span>
+                @php
+                    $newMessagesCount = \App\Models\ContactMessage::where('status', 'new')->count();
+                @endphp
+                @if($newMessagesCount > 0)
+                    <span class="ml-auto bg-be-amber text-be-ink text-[10px] font-bold px-1.5 py-0.5 rounded-full">{{ $newMessagesCount }}</span>
+                @endif
+            </a>
         </nav>
 
         <!-- Bottom: back to site -->
@@ -205,7 +220,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                         <input type="text" placeholder="Rechercher..."
-                               class="pl-9 pr-4 py-2 text-sm bg-slate-100 border-0 rounded-xl text-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500 w-48 transition-all focus:w-64">
+                               class="pl-9 pr-4 py-2 text-sm bg-slate-100 border-0 rounded-xl text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-400 w-48 transition-all focus:w-64">
                     </div>
 
                     <!-- Notifications bell -->
@@ -220,8 +235,8 @@
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open"
                                 class="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 transition-colors">
-                            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold"
-                                 style="background:linear-gradient(135deg,#7c3aed,#6366f1)">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-be-ink text-xs font-bold"
+                                 style="background:linear-gradient(135deg,#F5B301,#C9702B)">
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                             </div>
                             <div class="hidden md:block text-left">

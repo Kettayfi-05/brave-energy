@@ -35,6 +35,47 @@ class Product extends Model
         ];
     }
 
+    public function getIsActiveAttribute(): bool
+    {
+        return $this->status === 'active';
+    }
+
+    public function getOldPriceAttribute()
+    {
+        if ($this->hasActivePromotion()) {
+            return $this->attributes['price'] ?? null;
+        }
+        return null;
+    }
+
+    public function getPriceAttribute($value)
+    {
+        if ($this->hasActivePromotion()) {
+            $promo = $this->promotion;
+            if ($promo->discount_type === 'percentage') {
+                return $value * (1 - $promo->discount_percentage / 100);
+            } elseif ($promo->discount_type === 'fixed') {
+                return max(0.00, $value - $promo->discount_value);
+            }
+        }
+        return $value;
+    }
+
+    public function hasActivePromotion(): bool
+    {
+        // Check if relation is loaded, load if not
+        if (!$this->relationLoaded('promotion')) {
+            $this->load('promotion');
+        }
+
+        $promo = $this->promotion;
+        if (!$promo) {
+            return false;
+        }
+
+        return $promo->is_active && now()->between($promo->start_date, $promo->end_date);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Relationships

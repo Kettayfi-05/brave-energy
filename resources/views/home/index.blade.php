@@ -1,6 +1,28 @@
 @extends('layouts.app')
 
 @section('content')
+    @if(session('success'))
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+            <div class="rounded-xl bg-emerald-50 border border-emerald-200 p-4 flex gap-3 text-sm text-emerald-800 animate-none">
+                <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <div>{{ session('success') }}</div>
+            </div>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+            <div class="rounded-xl bg-rose-50 border border-rose-200 p-4 flex gap-3 text-sm text-rose-800 animate-none">
+                <svg class="w-5 h-5 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <div>{{ session('error') }}</div>
+            </div>
+        </div>
+    @endif
+
     {{-- ===================== HERO ===================== --}}
     <section class="relative bg-be-bg be-hero-grid overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-be-bg/40 to-be-bg"></div>
@@ -112,7 +134,7 @@
                 @endphp
 
                 @foreach ($categories as $cat)
-                    <a href="#" class="group relative rounded-xl bg-be-bg-2 p-6 overflow-hidden be-focus">
+                    <a href="{{ route('search.index') }}" class="group relative rounded-xl bg-be-bg-2 p-6 overflow-hidden be-focus">
                         <div class="flex items-start justify-between">
                             <span class="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center text-white/70 group-hover:text-be-amber transition-colors">
                                 <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $cat['icon'] }}"/></svg>
@@ -142,44 +164,79 @@
                     <span class="font-mono text-xs text-be-copper tracking-wide">SÉLECTION</span>
                     <h2 class="font-display font-bold text-3xl sm:text-4xl text-be-ink mt-2">Meilleures ventes du mois</h2>
                 </div>
-                <a href="#" class="text-sm font-semibold text-be-copper hover:text-be-ink transition-colors be-focus rounded">
+                <a href="{{ route('search.index') }}" class="text-sm font-semibold text-be-copper hover:text-be-ink transition-colors be-focus rounded">
                     Voir tout le catalogue →
                 </a>
             </div>
 
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @php
-                    $products = [
-                        ['name' => 'Câble souple H07V-K 2.5mm² (100m)', 'ref' => 'CBL-2540', 'price' => '420', 'old' => '480', 'badge' => 'PROMO'],
-                        ['name' => 'Disjoncteur différentiel 30mA 40A', 'ref' => 'DJC-4030', 'price' => '265', 'old' => null, 'badge' => 'NOUVEAU'],
-                        ['name' => 'Rallonge électrique 5m avec 3 prises', 'ref' => 'RAL-503P', 'price' => '89', 'old' => null, 'badge' => null],
-                        ['name' => 'Ampoule LED E27 12W lumière du jour', 'ref' => 'LED-E2712', 'price' => '19', 'old' => '29', 'badge' => 'PROMO'],
-                    ];
+                    $products = \App\Models\Product::with('images')->where('status', 'active')->where('is_featured', true)->take(4)->get();
+                    if ($products->isEmpty()) {
+                        $products = \App\Models\Product::with('images')->where('status', 'active')->take(4)->get();
+                    }
                 @endphp
 
-                @foreach ($products as $p)
-                    <div class="group rounded-xl border border-black/10 hover:border-be-amber/60 hover:shadow-lg transition-all overflow-hidden be-focus">
+                @foreach ($products as $product)
+                    <div class="group rounded-xl border border-black/10 hover:border-be-amber/60 hover:shadow-lg transition-all overflow-hidden bg-white be-focus">
                         <div class="relative aspect-[4/3] bg-be-cream flex items-center justify-center">
-                            @if($p['badge'])
-                                <span class="absolute top-3 left-3 text-[10px] font-mono font-semibold px-2 py-1 rounded {{ $p['badge'] === 'PROMO' ? 'bg-be-copper text-white' : 'bg-be-amber' }} {{ $p['badge'] === 'PROMO' ? '' : 'text-be-ink' }}">
-                                    {{ $p['badge'] }}
-                                </span>
+                            @if($product->old_price)
+                                <span class="absolute top-3 left-3 text-[10px] font-mono font-semibold px-2 py-1 rounded bg-be-copper text-white">PROMO</span>
                             @endif
-                            <svg class="w-14 h-14 text-be-ink/15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7h3l2 10h6l2-10h3M9 7v10M15 7v10"/></svg>
+
+                            @auth
+                                @if(Auth::user()->role !== 'admin')
+                                    @php
+                                        $isFav = Auth::user()->favorites->contains('product_id', $product->id);
+                                    @endphp
+                                    <form method="POST" action="{{ route('wishlist.toggle', $product) }}" class="absolute top-3 right-3 z-10">
+                                        @csrf
+                                        <button type="submit" class="w-8 h-8 rounded-full bg-white/90 border border-black/5 flex items-center justify-center text-be-ink hover:text-red-500 hover:scale-105 transition active:scale-95 shadow-sm" title="Favoris">
+                                            <svg class="w-4 h-4 {{ $isFav ? 'fill-current text-red-500' : 'fill-none' }}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                @endif
+                            @else
+                                <button @click="loginOpen = true" class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/90 border border-black/5 flex items-center justify-center text-be-ink hover:text-red-500 hover:scale-105 transition active:scale-95 shadow-sm" title="Favoris">
+                                    <svg class="w-4 h-4 fill-none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                    </svg>
+                                </button>
+                            @endauth
+
+                            @if($product->images->first())
+                                <img src="{{ asset('storage/' . $product->images->first()->path) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                            @else
+                                <svg class="w-14 h-14 text-be-ink/15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7h3l2 10h6l2-10h3M9 7v10M15 7v10"/></svg>
+                            @endif
                         </div>
                         <div class="p-4">
-                            <span class="font-mono text-[10px] text-be-ink/35">{{ $p['ref'] }}</span>
-                            <h3 class="font-medium text-sm text-be-ink mt-1 leading-snug">{{ $p['name'] }}</h3>
+                            <span class="font-mono text-[10px] text-be-ink/35">{{ $product->reference }}</span>
+                            <h3 class="font-medium text-sm text-be-ink mt-1 leading-snug line-clamp-2 min-h-[40px]">{{ $product->name }}</h3>
                             <div class="mt-3 flex items-center justify-between">
                                 <div class="flex items-baseline gap-2">
-                                    <span class="font-mono font-semibold text-be-ink">{{ $p['price'] }} MAD</span>
-                                    @if($p['old'])
-                                        <span class="font-mono text-xs text-be-ink/35 line-through">{{ $p['old'] }}</span>
+                                    <span class="font-mono font-semibold text-be-ink">{{ number_format($product->price, 2) }} MAD</span>
+                                    @if($product->old_price)
+                                        <span class="font-mono text-xs text-be-ink/35 line-through">{{ number_format($product->old_price, 2) }}</span>
                                     @endif
                                 </div>
-                                <button type="button" class="w-9 h-9 rounded-md bg-be-ink text-white flex items-center justify-center hover:bg-be-amber hover:text-be-ink transition-colors be-focus" aria-label="Ajouter au panier">
-                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h2l2.4 12.2a2 2 0 002 1.8h7.8a2 2 0 002-1.6L21 8H6"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg>
-                                </button>
+                                @auth
+                                    @if(Auth::user()->role !== 'admin')
+                                        <form method="POST" action="{{ route('cart.store') }}">
+                                            @csrf
+                                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                            <button type="submit" class="w-9 h-9 rounded-md bg-be-ink text-white flex items-center justify-center hover:bg-be-amber hover:text-be-ink transition-colors be-focus" aria-label="Ajouter au panier" title="Ajouter au panier">
+                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h2l2.4 12.2a2 2 0 002 1.8h7.8a2 2 0 002-1.6L21 8H6"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg>
+                                            </button>
+                                        </form>
+                                    @endif
+                                @else
+                                    <button @click="loginOpen = true" class="w-9 h-9 rounded-md bg-be-ink text-white flex items-center justify-center hover:bg-be-amber hover:text-be-ink transition-colors be-focus" aria-label="Ajouter au panier" title="Ajouter au panier">
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h2l2.4 12.2a2 2 0 002 1.8h7.8a2 2 0 002-1.6L21 8H6"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg>
+                                    </button>
+                                @endauth
                             </div>
                         </div>
                     </div>

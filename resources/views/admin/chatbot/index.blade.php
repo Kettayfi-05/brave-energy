@@ -22,8 +22,8 @@
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,#6366f1,#818cf8)">
-                        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,#F5B301,#C9702B)">
+                        <svg class="w-5 h-5 text-be-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
                         </svg>
                     </div>
@@ -33,7 +33,7 @@
                     </div>
                 </div>
                 <button onclick="document.getElementById('add-modal').classList.remove('hidden')"
-                        class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+                        class="inline-flex items-center gap-2 bg-be-amber hover:brightness-95 text-be-ink text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                     </svg>
@@ -69,7 +69,7 @@
                                 @if($kb->keywords && count($kb->keywords) > 0)
                                 <div class="flex flex-wrap gap-1 mt-2">
                                     @foreach(array_slice($kb->keywords, 0, 5) as $kw)
-                                        <span class="text-[10px] font-mono bg-indigo-50 text-indigo-500 px-2 py-0.5 rounded-full">{{ $kw }}</span>
+                                        <span class="text-[10px] font-mono bg-amber-50 text-be-copper px-2 py-0.5 rounded-full">{{ $kw }}</span>
                                     @endforeach
                                     @if(count($kb->keywords) > 5)
                                         <span class="text-[10px] text-slate-400">+{{ count($kb->keywords) - 5 }}</span>
@@ -79,7 +79,7 @@
                             </div>
                             <div class="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button onclick="openEdit({{ $kb->id }}, {{ json_encode($kb->title) }}, {{ json_encode($kb->question) }}, {{ json_encode($kb->answer) }}, {{ json_encode(implode(', ', $kb->keywords ?? [])) }}, {{ $kb->is_active ? 'true' : 'false' }})"
-                                        class="p-2 rounded-lg hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 transition-colors" title="Modifier">
+                                        class="p-2 rounded-lg hover:bg-amber-50 text-slate-400 hover:text-be-copper transition-colors" title="Modifier">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                     </svg>
@@ -129,10 +129,10 @@
             {{-- Input --}}
             <div class="px-4 py-3 border-t border-slate-100 flex gap-2">
                 <input type="text" id="admin-chat-input" placeholder="Testez une question…"
-                       class="flex-1 text-sm bg-slate-100 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-slate-700 placeholder-slate-400">
+                       class="flex-1 text-sm bg-slate-100 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-400 text-slate-700 placeholder-slate-400">
                 <button onclick="adminChatSend()"
-                        class="w-10 h-10 rounded-xl flex items-center justify-center text-white transition-colors"
-                        style="background:linear-gradient(135deg,#6366f1,#818cf8)">
+                        class="w-10 h-10 rounded-xl flex items-center justify-center text-be-ink transition-colors"
+                        style="background:linear-gradient(135deg,#F5B301,#C9702B)">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                     </svg>
@@ -154,7 +154,7 @@
                 </div>
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-slate-600">Total mots-clés</span>
-                    <span class="font-mono font-bold text-indigo-600">{{ $knowledges->sum(fn($k) => count($k->keywords ?? [])) }}</span>
+                    <span class="font-mono font-bold text-be-copper">{{ $knowledges->sum(fn($k) => count($k->keywords ?? [])) }}</span>
                 </div>
             </div>
         </div>
@@ -175,30 +175,30 @@
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Titre / Sujet</label>
                 <input type="text" name="title" required placeholder="ex : Horaires d'ouverture"
-                       class="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                       class="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-400">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Question type</label>
                 <input type="text" name="question" required placeholder="ex : Quels sont vos horaires ?"
-                       class="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                       class="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-400">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Réponse du chatbot</label>
                 <textarea name="answer" required rows="4" placeholder="La réponse que le chatbot donnera…"
-                          class="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
+                          class="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"></textarea>
             </div>
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Mots-clés déclencheurs <span class="font-normal text-slate-400">(séparés par des virgules)</span></label>
                 <input type="text" name="keywords" placeholder="ex : horaires, ouverture, heure, quand"
-                       class="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                       class="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-400">
             </div>
             <div class="flex items-center gap-3">
                 <input type="checkbox" name="is_active" id="add_is_active" value="1" checked
-                       class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                       class="rounded border-slate-300 text-be-amber focus:ring-be-amber">
                 <label for="add_is_active" class="text-sm text-slate-700 cursor-pointer">Activer immédiatement</label>
             </div>
             <div class="flex items-center gap-3 pt-2">
-                <button type="submit" class="flex-1 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2.5 transition-colors">
+                <button type="submit" class="flex-1 rounded-xl bg-be-amber hover:brightness-95 text-be-ink text-sm font-semibold py-2.5 transition-colors">
                     Enregistrer
                 </button>
                 <button type="button" onclick="document.getElementById('add-modal').classList.add('hidden')"
@@ -224,30 +224,30 @@
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Titre / Sujet</label>
                 <input type="text" name="title" id="edit_title" required
-                       class="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                       class="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-400">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Question type</label>
                 <input type="text" name="question" id="edit_question" required
-                       class="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                       class="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-400">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Réponse du chatbot</label>
                 <textarea name="answer" id="edit_answer" required rows="4"
-                          class="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
+                          class="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"></textarea>
             </div>
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Mots-clés</label>
                 <input type="text" name="keywords" id="edit_keywords"
-                       class="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                       class="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-400">
             </div>
             <div class="flex items-center gap-3">
                 <input type="checkbox" name="is_active" id="edit_is_active" value="1"
-                       class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                       class="rounded border-slate-300 text-be-amber focus:ring-be-amber">
                 <label for="edit_is_active" class="text-sm text-slate-700 cursor-pointer">Actif</label>
             </div>
             <div class="flex items-center gap-3 pt-2">
-                <button type="submit" class="flex-1 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2.5 transition-colors">
+                <button type="submit" class="flex-1 rounded-xl bg-be-amber hover:brightness-95 text-be-ink text-sm font-semibold py-2.5 transition-colors">
                     Enregistrer
                 </button>
                 <button type="button" onclick="document.getElementById('edit-modal').classList.add('hidden')"
@@ -285,7 +285,7 @@ function adminChatSend() {
     // User bubble
     chatbox.innerHTML += `
         <div class="flex gap-2 justify-end">
-            <div class="bg-indigo-600 text-white rounded-2xl rounded-tr-sm px-3 py-2 text-sm max-w-[85%]">${msg}</div>
+            <div class="bg-be-amber text-be-ink font-semibold rounded-2xl rounded-tr-sm px-3 py-2 text-sm max-w-[85%]">${msg}</div>
             <div class="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center shrink-0 text-xs font-bold text-slate-500">Toi</div>
         </div>`;
     chatbox.scrollTop = chatbox.scrollHeight;

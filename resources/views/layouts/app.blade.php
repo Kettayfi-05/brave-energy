@@ -52,7 +52,7 @@
             [x-cloak] { display: none !important; }
         </style>
     </head>
-    <body class="font-sans antialiased text-be-ink bg-be-cream">
+    <body id="top" class="font-sans antialiased text-be-ink bg-be-cream">
         <div class="min-h-screen flex flex-col justify-between" x-data="{ mobileOpen: false, searchOpen: false, loginOpen: {{ old('auth_form') === 'login' ? 'true' : 'false' }}, registerOpen: {{ old('auth_form') === 'register' ? 'true' : 'false' }} }">
             <div>
                 {{-- ===================== UTILITY BAR ===================== --}}
@@ -89,7 +89,7 @@
 
                             {{-- Links desktop --}}
                             <div class="hidden lg:flex items-center gap-8 font-medium text-sm text-white/80">
-                                <a href="{{ url('/') }}" class="hover:text-be-amber transition-colors be-focus rounded">Accueil</a>
+                                <a href="{{ route('home') }}#top" class="hover:text-be-amber transition-colors be-focus rounded">Accueil</a>
                                 
                                 {{-- Dropdown Categories --}}
                                 <div class="relative" x-data="{ open: false }">
@@ -116,11 +116,15 @@
                                     </div>
                                 </div>
 
-                                <a href="{{ url('/#produits') }}" class="hover:text-be-amber transition-colors be-focus rounded">Promotions</a>
-                                <a href="#contact" class="hover:text-be-amber transition-colors be-focus rounded">Contact</a>
+                                <a href="{{ route('promotions') }}" class="hover:text-be-amber transition-colors be-focus rounded">Promotions</a>
+                                @if(!Auth::check() || Auth::user()->role !== 'admin')
+                                    <a href="{{ route('contact') }}" class="hover:text-be-amber transition-colors be-focus rounded">Contact</a>
+                                @endif
                                 @auth
-                                    <a href="#wishlist" class="hover:text-be-amber transition-colors be-focus rounded">Wishlist</a>
-                                    <a href="#historique" class="hover:text-be-amber transition-colors be-focus rounded">Historique de demandes</a>
+                                    @if(Auth::user()->role !== 'admin')
+                                        <a href="{{ route('wishlist.index') }}" class="hover:text-be-amber transition-colors be-focus rounded">Wishlist</a>
+                                        <a href="{{ route('orders.index') }}" class="hover:text-be-amber transition-colors be-focus rounded">Historique de demandes</a>
+                                    @endif
                                 @endauth
                             </div>
 
@@ -143,10 +147,11 @@
                                                 <p class="text-xs text-white/50">Connecté en tant que</p>
                                                 <p class="text-sm font-semibold text-white truncate">{{ Auth::user()->name }}</p>
                                             </div>
-                                            <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-xs text-white/85 hover:bg-white/5 hover:text-be-amber">Tableau de bord</a>
-                                            <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-xs text-white/85 hover:bg-white/5 hover:text-be-amber">Mon Profil</a>
                                             @if(Auth::user()->role === 'admin')
                                                 <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-xs text-white/85 hover:bg-white/5 hover:text-be-amber font-semibold text-be-amber">Administration</a>
+                                            @else
+                                                <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-xs text-white/85 hover:bg-white/5 hover:text-be-amber">Tableau de bord</a>
+                                                <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-xs text-white/85 hover:bg-white/5 hover:text-be-amber">Mon Profil</a>
                                             @endif
                                             <form method="POST" action="{{ route('logout') }}">
                                                 @csrf
@@ -163,10 +168,17 @@
                                 @endauth
 
                                 @auth
-                                    <a href="#" class="relative flex w-10 h-10 items-center justify-center rounded-md text-white/80 hover:text-be-amber hover:bg-white/5 transition-colors be-focus" aria-label="Panier">
-                                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h2l2.4 12.2a2 2 0 002 1.8h7.8a2 2 0 002-1.6L21 8H6"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg>
-                                        <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-be-amber text-be-ink text-[10px] font-bold flex items-center justify-center">3</span>
-                                    </a>
+                                    @if(Auth::user()->role !== 'admin')
+                                        <a href="{{ route('cart.index') }}" class="relative flex w-10 h-10 items-center justify-center rounded-md text-white/80 hover:text-be-amber hover:bg-white/5 transition-colors be-focus" aria-label="Panier">
+                                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h2l2.4 12.2a2 2 0 002 1.8h7.8a2 2 0 002-1.6L21 8H6"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg>
+                                            @php
+                                                $cartCount = Auth::user()->cart?->cartItems()->sum('quantity') ?? 0;
+                                            @endphp
+                                            @if($cartCount > 0)
+                                                <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-be-amber text-be-ink text-[10px] font-bold flex items-center justify-center">{{ $cartCount }}</span>
+                                            @endif
+                                        </a>
+                                    @endif
                                 @endauth
 
                                 {{-- Hamburger menu button (mobile) --}}
@@ -195,7 +207,7 @@
                     {{-- Mobile menu content --}}
                     <div x-show="mobileOpen" x-cloak x-transition
                          class="lg:hidden border-t border-white/10 bg-be-bg px-4 sm:px-6 py-4 space-y-1">
-                        <a href="{{ url('/') }}" class="block px-2 py-2.5 rounded-md text-white/85 hover:bg-white/5 hover:text-be-amber font-medium">Accueil</a>
+                        <a href="{{ route('home') }}#top" class="block px-2 py-2.5 rounded-md text-white/85 hover:bg-white/5 hover:text-be-amber font-medium">Accueil</a>
                         
                         {{-- Mobile categories accordion --}}
                         <div x-data="{ localOpen: false }">
@@ -212,20 +224,23 @@
                             </div>
                         </div>
 
-                        <a href="{{ url('/#produits') }}" class="block px-2 py-2.5 rounded-md text-white/85 hover:bg-white/5 hover:text-be-amber font-medium">Promotions</a>
-                        <a href="#contact" class="block px-2 py-2.5 rounded-md text-white/85 hover:bg-white/5 hover:text-be-amber font-medium">Contact</a>
+                        <a href="{{ route('promotions') }}" class="block px-2 py-2.5 rounded-md text-white/85 hover:bg-white/5 hover:text-be-amber font-medium">Promotions</a>
+                        @if(!Auth::check() || Auth::user()->role !== 'admin')
+                            <a href="{{ route('contact') }}" class="block px-2 py-2.5 rounded-md text-white/85 hover:bg-white/5 hover:text-be-amber font-medium">Contact</a>
+                        @endif
                         @auth
-                            <a href="#wishlist" class="block px-2 py-2.5 rounded-md text-white/85 hover:bg-white/5 hover:text-be-amber font-medium">Wishlist</a>
-                            <a href="#historique" class="block px-2 py-2.5 rounded-md text-white/85 hover:bg-white/5 hover:text-be-amber font-medium">Historique de demandes</a>
+                            @if(Auth::user()->role !== 'admin')
+                                <a href="{{ route('wishlist.index') }}" class="block px-2 py-2.5 rounded-md text-white/85 hover:bg-white/5 hover:text-be-amber font-medium">Wishlist</a>
+                                <a href="{{ route('orders.index') }}" class="block px-2 py-2.5 rounded-md text-white/85 hover:bg-white/5 hover:text-be-amber font-medium">Historique de demandes</a>
+                            @endif
                         @endauth
                         <button @click="mobileOpen = false; searchOpen = !searchOpen" class="w-full text-left block px-2 py-2.5 rounded-md text-white/85 hover:bg-white/5 hover:text-be-amber font-medium">Recherche</button>
                         @auth
-                            <a href="#panier" class="block px-2 py-2.5 rounded-md text-white/85 hover:bg-white/5 hover:text-be-amber font-medium">Mon Panier (3)</a>
-                        @endauth
-                        @auth
-                            <a href="{{ route('dashboard') }}" class="block px-2 py-2.5 rounded-md text-white/85 hover:bg-white/5 hover:text-be-amber font-medium">Tableau de bord</a>
-                            <a href="{{ route('profile.edit') }}" class="block px-2 py-2.5 rounded-md text-white/85 hover:bg-white/5 hover:text-be-amber font-medium">Mon Profil</a>
-                            @if(Auth::user()->role === 'admin')
+                            @if(Auth::user()->role !== 'admin')
+                                <a href="{{ route('cart.index') }}" class="block px-2 py-2.5 rounded-md text-white/85 hover:bg-white/5 hover:text-be-amber font-medium">Mon Panier ({{ Auth::user()->cart?->cartItems()->sum('quantity') ?? 0 }})</a>
+                                <a href="{{ route('dashboard') }}" class="block px-2 py-2.5 rounded-md text-white/85 hover:bg-white/5 hover:text-be-amber font-medium">Tableau de bord</a>
+                                <a href="{{ route('profile.edit') }}" class="block px-2 py-2.5 rounded-md text-white/85 hover:bg-white/5 hover:text-be-amber font-medium">Mon Profil</a>
+                            @else
                                 <a href="{{ route('admin.dashboard') }}" class="block px-2 py-2.5 rounded-md text-be-amber hover:bg-white/5 font-semibold">Administration</a>
                             @endif
                             <form method="POST" action="{{ route('logout') }}" class="block">
@@ -249,7 +264,7 @@
 
             {{-- ===================== FOOTER ===================== --}}
             <footer id="contact" class="bg-be-bg text-white/60 mt-auto">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
 
                     <div>
                         <div class="flex items-center gap-2">
@@ -262,17 +277,6 @@
                             Votre fournisseur de matériel électrique au Maroc : câbles, disjoncteurs,
                             éclairage et accessoires certifiés, pour professionnels et particuliers.
                         </p>
-                        <div class="flex items-center gap-3 mt-5">
-                            @foreach ([
-                                'M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3V2z',
-                                'M12 2a10 10 0 100 20 10 10 0 000-20zm3.5 7.5c-1 3-2.5 5.5-5.5 7-1-1-2-2.5-2-4.5 2 1 4 .5 5-1 .5 1 1.5 1.5 2.5 1.5-.5-1-.5-2-.2-3z',
-                                'M4 4h16v16H4V4zm4 4v8m0-8h4a2 2 0 012 2v6',
-                            ] as $social)
-                                <a href="#" class="w-8 h-8 rounded-md bg-white/5 hover:bg-be-amber hover:text-be-ink flex items-center justify-center transition-colors be-focus">
-                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $social }}"/></svg>
-                                </a>
-                            @endforeach
-                        </div>
                     </div>
 
                     <div>
@@ -280,20 +284,8 @@
                         <ul class="mt-4 space-y-2.5 text-sm">
                             <li><a href="{{ url('/') }}" class="hover:text-be-amber transition-colors">Accueil</a></li>
                             <li><a href="{{ url('/#produits') }}" class="hover:text-be-amber transition-colors">Promotions</a></li>
-                            <li><a href="#" class="hover:text-be-amber transition-colors">À propos</a></li>
-                            <li><a href="#" class="hover:text-be-amber transition-colors">Livraison &amp; retours</a></li>
-                            <li><a href="#" class="hover:text-be-amber transition-colors">Devenir revendeur</a></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h3 class="font-display font-semibold text-white text-sm tracking-wide">CATÉGORIES</h3>
-                        <ul class="mt-4 space-y-2.5 text-sm">
-                            <li><a href="{{ url('/#categories') }}" class="hover:text-be-amber transition-colors">Câbles &amp; fils</a></li>
-                            <li><a href="{{ url('/#categories') }}" class="hover:text-be-amber transition-colors">Disjoncteurs</a></li>
-                            <li><a href="{{ url('/#categories') }}" class="hover:text-be-amber transition-colors">Éclairage LED</a></li>
-                            <li><a href="{{ url('/#categories') }}" class="hover:text-be-amber transition-colors">Rallonges &amp; prises</a></li>
-                            <li><a href="{{ url('/#categories') }}" class="hover:text-be-amber transition-colors">Outillage</a></li>
+                            <li><a href="{{ route('about') }}" class="hover:text-be-amber transition-colors">À propos</a></li>
+                            <li><a href="{{ route('contact') }}" class="hover:text-be-amber transition-colors">Contact</a></li>
                         </ul>
                     </div>
 
@@ -302,11 +294,11 @@
                         <ul class="mt-4 space-y-3 text-sm">
                             <li class="flex items-start gap-2.5">
                                 <svg class="w-4 h-4 mt-0.5 text-be-amber shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11zM12 13a2.5 2.5 0 100-5 2.5 2.5 0 000 5z"/></svg>
-                                Zone Industrielle, Casablanca, Maroc
+                                Zone Industrielle, El Jadida, Maroc
                             </li>
                             <li class="flex items-center gap-2.5">
                                 <svg class="w-4 h-4 text-be-amber shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h2.28a1 1 0 011 .8l1.06 5.28a1 1 0 01-.54 1.11l-1.6.8a11.04 11.04 0 006.36 6.36l.8-1.6a1 1 0 011.11-.54l5.28 1.06a1 1 0 01.8 1V19a2 2 0 01-2 2h-1C9.16 21 3 14.84 3 7V6z"/></svg>
-                                +212 5 22 00 00 00
+                                +212 5 23 37 39 99
                             </li>
                             <li class="flex items-center gap-2.5">
                                 <svg class="w-4 h-4 text-be-amber shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4h16v16H4V4zm0 0 8 8 8-8"/></svg>

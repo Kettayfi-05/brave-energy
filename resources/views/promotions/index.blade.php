@@ -2,32 +2,6 @@
 
 @section('content')
 <div class="min-h-screen bg-be-cream">
-
-    {{-- ===== HEADER ===== --}}
-    <div class="bg-be-bg border-b border-white/10 py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <span class="font-mono text-xs text-be-amber tracking-widest">RECHERCHE</span>
-            <h1 class="font-display font-bold text-3xl sm:text-4xl text-white mt-2">
-                Trouvez votre matériel électrique
-            </h1>
-
-            {{-- Search bar --}}
-            <form method="GET" action="{{ route('search.index') }}" id="search-form" class="mt-6 flex gap-3">
-                <div class="relative flex-1 max-w-2xl">
-                    <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m21 21-4.3-4.3"/>
-                    </svg>
-                    <input type="text" name="q" id="q" value="{{ request('q') }}"
-                           placeholder="Câble, disjoncteur, ampoule, référence…"
-                           class="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/35 text-sm focus:outline-none focus:ring-2 focus:ring-be-amber">
-                </div>
-                <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-be-amber px-6 py-3.5 text-sm font-semibold text-be-ink hover:brightness-95 transition">
-                    Rechercher
-                </button>
-            </form>
-        </div>
-    </div>
-
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         
         @if(session('success'))
@@ -69,91 +43,67 @@
                     </button>
 
                     <div class="hidden lg:block" :class="filtersOpen ? '!block' : ''">
-                        <form method="GET" action="{{ route('search.index') }}" id="filter-form">
+                        <form method="GET" action="{{ route('promotions') }}" id="filter-form">
                             <input type="hidden" name="q" value="{{ request('q') }}">
 
-                            <div class="px-5 py-4 border-b border-black/5">
-                                <p class="font-display font-semibold text-be-ink text-sm flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-be-copper" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" d="M3 4h18M6 8h12M9 12h6M12 16h0"/>
-                                    </svg>
-                                    Filtrer les résultats
-                                </p>
-                            </div>
-
-                            {{-- Catégorie --}}
-                            <div class="px-5 py-4 border-b border-black/5">
-                                <label class="block font-mono text-[11px] text-be-ink/50 tracking-wider uppercase mb-3">Catégorie</label>
-                                <select name="category" onchange="document.getElementById('filter-form').submit()"
-                                        class="w-full rounded-lg bg-be-cream border border-black/10 px-3 py-2 text-sm text-be-ink focus:outline-none focus:ring-2 focus:ring-be-amber">
-                                    <option value="">Toutes les catégories</option>
+                            {{-- Categories filter --}}
+                            <div class="p-5 border-b border-black/5">
+                                <h3 class="font-display font-semibold text-be-ink text-sm tracking-wide">RAYONS</h3>
+                                <div class="mt-4 space-y-2">
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="radio" name="category" value="" class="rounded-full border-black/10 text-be-amber focus:ring-be-amber"
+                                               {{ !request('category') ? 'checked' : '' }} onchange="document.getElementById('filter-form').submit()">
+                                        <span class="ml-2 text-xs text-be-ink/70 font-medium">Tous les rayons</span>
+                                    </label>
                                     @foreach($categories as $cat)
-                                        <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>
-                                            {{ $cat->name }}
-                                        </option>
+                                        <label class="flex items-center cursor-pointer">
+                                            <input type="radio" name="category" value="{{ $cat->id }}" class="rounded-full border-black/10 text-be-amber focus:ring-be-amber"
+                                                   {{ request('category') == $cat->id ? 'checked' : '' }} onchange="document.getElementById('filter-form').submit()">
+                                            <span class="ml-2 text-xs text-be-ink/70 font-medium">{{ $cat->name }}</span>
+                                        </label>
                                     @endforeach
-                                </select>
-                            </div>
-
-                            {{-- Marque --}}
-                            <div class="px-5 py-4 border-b border-black/5">
-                                <label class="block font-mono text-[11px] text-be-ink/50 tracking-wider uppercase mb-3">Marque</label>
-                                <select name="brand" onchange="document.getElementById('filter-form').submit()"
-                                        class="w-full rounded-lg bg-be-cream border border-black/10 px-3 py-2 text-sm text-be-ink focus:outline-none focus:ring-2 focus:ring-be-amber">
-                                    <option value="">Toutes les marques</option>
-                                    @foreach($brands as $brand)
-                                        <option value="{{ $brand->id }}" {{ request('brand') == $brand->id ? 'selected' : '' }}>
-                                            {{ $brand->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            {{-- Prix --}}
-                            <div class="px-5 py-4 border-b border-black/5">
-                                <label class="block font-mono text-[11px] text-be-ink/50 tracking-wider uppercase mb-3">Prix (MAD)</label>
-                                <div class="flex items-center gap-2">
-                                    <input type="number" name="price_min" value="{{ request('price_min') }}" placeholder="Min"
-                                           min="0" class="w-full rounded-lg bg-be-cream border border-black/10 px-3 py-2 text-sm text-be-ink focus:outline-none focus:ring-2 focus:ring-be-amber">
-                                    <span class="text-be-ink/30 shrink-0">—</span>
-                                    <input type="number" name="price_max" value="{{ request('price_max') }}" placeholder="Max"
-                                           min="0" class="w-full rounded-lg bg-be-cream border border-black/10 px-3 py-2 text-sm text-be-ink focus:outline-none focus:ring-2 focus:ring-be-amber">
                                 </div>
                             </div>
 
-                            {{-- Promotions --}}
-                            <div class="px-5 py-4 border-b border-black/5">
-                                <label class="flex items-center gap-3 cursor-pointer">
-                                    <input type="checkbox" name="promo" value="1" onchange="document.getElementById('filter-form').submit()"
-                                           {{ request('promo') ? 'checked' : '' }}
-                                           class="rounded border-black/10 text-be-amber focus:ring-be-amber">
-                                    <span class="text-sm font-medium text-be-ink">Promotions uniquement</span>
-                                    <span class="ml-auto px-2 py-0.5 rounded-full bg-be-copper text-white text-[10px] font-mono font-bold">PROMO</span>
-                                </label>
+                            {{-- Brand filter --}}
+                            <div class="p-5 border-b border-black/5">
+                                <h3 class="font-display font-semibold text-be-ink text-sm tracking-wide">MARQUES</h3>
+                                <div class="mt-4 space-y-2">
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="radio" name="brand" value="" class="rounded-full border-black/10 text-be-amber focus:ring-be-amber"
+                                               {{ !request('brand') ? 'checked' : '' }} onchange="document.getElementById('filter-form').submit()">
+                                        <span class="ml-2 text-xs text-be-ink/70 font-medium">Toutes les marques</span>
+                                    </label>
+                                    @foreach($brands as $brand)
+                                        <label class="flex items-center cursor-pointer">
+                                            <input type="radio" name="brand" value="{{ $brand->id }}" class="rounded-full border-black/10 text-be-amber focus:ring-be-amber"
+                                                   {{ request('brand') == $brand->id ? 'checked' : '' }} onchange="document.getElementById('filter-form').submit()">
+                                            <span class="ml-2 text-xs text-be-ink/70 font-medium">{{ $brand->name }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
                             </div>
 
-                            {{-- Trier --}}
-                            <div class="px-5 py-4 border-b border-black/5">
-                                <label class="block font-mono text-[11px] text-be-ink/50 tracking-wider uppercase mb-3">Trier par</label>
-                                <select name="sort" onchange="document.getElementById('filter-form').submit()"
-                                        class="w-full rounded-lg bg-be-cream border border-black/10 px-3 py-2 text-sm text-be-ink focus:outline-none focus:ring-2 focus:ring-be-amber">
-                                    <option value="relevance" {{ request('sort','relevance') === 'relevance' ? 'selected' : '' }}>Pertinence</option>
-                                    <option value="newest"    {{ request('sort') === 'newest'    ? 'selected' : '' }}>Nouveautés</option>
-                                    <option value="price_asc" {{ request('sort') === 'price_asc' ? 'selected' : '' }}>Prix croissant</option>
-                                    <option value="price_desc"{{ request('sort') === 'price_desc'? 'selected' : '' }}>Prix décroissant</option>
-                                </select>
-                            </div>
-
-                            {{-- Apply & reset --}}
-                            <div class="px-5 py-4 flex gap-2">
-                                <button type="submit" class="flex-1 rounded-lg bg-be-amber px-4 py-2.5 text-sm font-semibold text-be-ink hover:brightness-95 transition">
-                                    Appliquer
+                            {{-- Price range --}}
+                            <div class="p-5">
+                                <h3 class="font-display font-semibold text-be-ink text-sm tracking-wide">PRIX (MAD)</h3>
+                                <div class="mt-4 grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block font-mono text-[10px] text-be-ink/40 uppercase mb-1">Min</label>
+                                        <input type="number" name="min_price" value="{{ request('min_price') }}" placeholder="0"
+                                               class="w-full rounded bg-be-cream border-0 px-2 py-1.5 font-mono text-xs text-be-ink focus:ring-1 focus:ring-be-amber">
+                                    </div>
+                                    <div>
+                                        <label class="block font-mono text-[10px] text-be-ink/40 uppercase mb-1">Max</label>
+                                        <input type="number" name="max_price" value="{{ request('max_price') }}" placeholder="10000"
+                                               class="w-full rounded bg-be-cream border-0 px-2 py-1.5 font-mono text-xs text-be-ink focus:ring-1 focus:ring-be-amber">
+                                    </div>
+                                </div>
+                                <button type="submit" class="w-full mt-4 bg-be-ink text-white font-semibold text-xs py-2 rounded hover:bg-be-amber hover:text-be-ink transition">
+                                    Appliquer les filtres
                                 </button>
-                                <a href="{{ route('search.index', ['q' => request('q')]) }}"
-                                   class="flex-1 text-center rounded-lg bg-be-cream border border-black/10 px-4 py-2.5 text-sm font-medium text-be-ink/60 hover:text-be-ink transition">
-                                    Effacer
-                                </a>
                             </div>
+
                         </form>
                     </div>
                 </div>
@@ -161,38 +111,22 @@
 
             {{-- ===== RESULTS ===== --}}
             <main>
+                {{-- Header --}}
+                <div class="flex items-center justify-between flex-wrap gap-4 mb-6">
+                    <div>
+                        <h1 class="font-display font-bold text-2xl sm:text-3xl text-be-ink">Nos Promotions</h1>
+                        <p class="text-xs text-be-ink/45 mt-1">{{ $products->total() }} produit(s) en promotion trouvé(s)</p>
+                    </div>
 
-                {{-- Results header --}}
-                <div class="flex items-center justify-between mb-6">
-                    <p class="text-sm text-be-ink/60">
-                        @if(request('q'))
-                            <span class="font-semibold text-be-ink">{{ $products->total() }}</span> résultat(s) pour
-                            <span class="font-semibold text-be-amber">"{{ request('q') }}"</span>
-                        @else
-                            <span class="font-semibold text-be-ink">{{ $products->total() }}</span> produit(s)
-                        @endif
-                    </p>
-
-                    {{-- Active filter pills --}}
-                    <div class="flex flex-wrap gap-2">
-                        @if(request('category') && $categories->find(request('category')))
-                            <span class="inline-flex items-center gap-1.5 text-xs font-medium bg-be-ink text-white/80 px-3 py-1 rounded-full">
-                                {{ $categories->find(request('category'))->name }}
-                                <a href="{{ request()->fullUrlWithoutQuery('category') }}" class="hover:text-be-amber">✕</a>
-                            </span>
-                        @endif
-                        @if(request('brand') && $brands->find(request('brand')))
-                            <span class="inline-flex items-center gap-1.5 text-xs font-medium bg-be-ink text-white/80 px-3 py-1 rounded-full">
-                                {{ $brands->find(request('brand'))->name }}
-                                <a href="{{ request()->fullUrlWithoutQuery('brand') }}" class="hover:text-be-amber">✕</a>
-                            </span>
-                        @endif
-                        @if(request('promo'))
-                            <span class="inline-flex items-center gap-1.5 text-xs font-bold bg-be-copper text-white px-3 py-1 rounded-full">
-                                PROMO
-                                <a href="{{ request()->fullUrlWithoutQuery('promo') }}" class="hover:text-white/60">✕</a>
-                            </span>
-                        @endif
+                    {{-- Sorting --}}
+                    <div>
+                        <select name="sort" form="filter-form" onchange="document.getElementById('filter-form').submit()"
+                                class="rounded bg-white border border-black/5 font-medium text-xs text-be-ink/70 px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-be-amber cursor-pointer">
+                            <option value="relevance" {{ request('sort') == 'relevance' ? 'selected' : '' }}>Trier par pertinence</option>
+                            <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Prix : croissant</option>
+                            <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Prix : décroissant</option>
+                            <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Nouveautés</option>
+                        </select>
                     </div>
                 </div>
 
@@ -280,25 +214,24 @@
                     <div class="mt-10">
                         {{ $products->links() }}
                     </div>
-
                 @else
-                    {{-- Empty state --}}
-                    <div class="flex flex-col items-center justify-center py-24 text-center">
-                        <div class="w-20 h-20 rounded-2xl bg-be-ink flex items-center justify-center mb-6">
-                            <svg class="w-9 h-9 text-white/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <div class="bg-white rounded-2xl border border-black/5 shadow-sm p-12 text-center flex flex-col items-center">
+                        <div class="w-20 h-20 rounded-2xl bg-be-cream flex items-center justify-center mb-6">
+                            <svg class="w-8 h-8 text-be-ink/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                                 <circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m21 21-4.3-4.3"/>
                             </svg>
                         </div>
-                        <h2 class="font-display font-bold text-xl text-be-ink">Aucun résultat trouvé</h2>
+                        <h2 class="font-display font-bold text-xl text-be-ink">Aucune promotion trouvée</h2>
                         <p class="text-be-ink/50 text-sm mt-2 max-w-xs">
-                            Essayez avec d'autres mots-clés ou supprimez certains filtres.
+                            Aucun produit en promotion ne correspond à vos critères de recherche.
                         </p>
-                        <a href="{{ route('search.index') }}" class="mt-6 inline-flex items-center gap-2 rounded-lg bg-be-amber px-5 py-2.5 text-sm font-semibold text-be-ink hover:brightness-95 transition">
-                            Voir tous les produits
+                        <a href="{{ route('promotions') }}" class="mt-6 bg-be-amber text-be-ink font-semibold text-xs px-5 py-3 rounded-lg hover:brightness-95 transition">
+                            Réinitialiser la recherche
                         </a>
                     </div>
                 @endif
             </main>
+
         </div>
     </div>
 </div>
